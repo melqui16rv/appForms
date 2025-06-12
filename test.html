@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de APIs</title>
+</head>
+<body>
+    <h1>Prueba de APIs del Sistema</h1>
+    
+    <div>
+        <h2>Crear Diseño de Prueba</h2>
+        <button onclick="testDisenoCreation()">Crear Diseño</button>
+        <div id="disenoResult"></div>
+    </div>
+    
+    <div>
+        <h2>Crear Competencia de Prueba</h2>
+        <button onclick="testCompetenciaCreation()">Crear Competencia</button>
+        <div id="competenciaResult"></div>
+    </div>
+    
+    <div>
+        <h2>Crear RAP de Prueba</h2>
+        <button onclick="testRapCreation()">Crear RAP</button>
+        <div id="rapResult"></div>
+    </div>
+
+    <script>
+    async function testDisenoCreation() {
+        const data = {
+            codigoPrograma: "TEST002",
+            versionPrograma: "1",
+            lineaTecnologica: "Gestión de la Información",
+            redTecnologica: "Red de Comunicaciones",
+            redConocimiento: "Desarrollo de Software",
+            horasDesarrolloDiseño: 2000,
+            mesesDesarrolloDiseño: 15,
+            nivelAcademicoIngreso: "Bachillerato",
+            gradoNivelAcademico: "11",
+            formacionTrabajoDesarrolloHumano: "Si",
+            edadMinima: 17,
+            requisitosAdicionales: "Conocimientos básicos en programación"
+        };
+        
+        try {
+            const response = await fetch('api/disenos.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            document.getElementById('disenoResult').innerHTML = 
+                `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        } catch (error) {
+            document.getElementById('disenoResult').innerHTML = 
+                `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+    }
+    
+    async function testCompetenciaCreation() {
+        const data = {
+            codigoDiseno: "TEST002-1",
+            codigoCompetencia: "220501001",
+            nombreCompetencia: "Programar aplicaciones web",
+            normaUnidadCompetencia: "NCL 220501001: Programar aplicaciones web según requerimientos",
+            horasDesarrolloCompetencia: 520,
+            requisitosAcademicosInstructor: "Ingeniero de Sistemas",
+            experienciaLaboralInstructor: "36 meses en desarrollo web"
+        };
+        
+        try {
+            const response = await fetch('api/competencias.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            document.getElementById('competenciaResult').innerHTML = 
+                `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        } catch (error) {
+            document.getElementById('competenciaResult').innerHTML = 
+                `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+    }
+    
+    async function testRapCreation() {
+        const data = {
+            codigoDiseno: "TEST002-1",
+            codigoCompetencia: "220501001",
+            codigoRap: "RA1",
+            nombreRap: "Configurar el ambiente de desarrollo según las tecnologías seleccionadas",
+            horasDesarrolloRap: 80
+        };
+        
+        try {
+            const response = await fetch('api/raps.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            document.getElementById('rapResult').innerHTML = 
+                `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+        } catch (error) {
+            document.getElementById('rapResult').innerHTML = 
+                `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+    }
+    </script>
+</body>
+</html>
