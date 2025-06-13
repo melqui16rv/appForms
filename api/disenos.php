@@ -120,7 +120,11 @@ function createDiseno($pdo) {
             $data['requisitosAdicionales']
         ]);
         
-        echo json_encode(['message' => 'Diseño creado exitosamente', 'codigoDiseño' => $codigoDiseno]);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Diseño creado exitosamente', 
+            'codigoDiseño' => $codigoDiseno
+        ]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['error' => 'Error al crear el diseño: ' . $e->getMessage()]);
@@ -151,11 +155,11 @@ function updateDiseno($pdo, $codigo) {
             $data['lineaTecnologica'],
             $data['redTecnologica'],
             $data['redConocimiento'],
-            $data['horasDesarrollo'] ?: 0,
-            $data['mesesDesarrollo'] ?: 0,
-            $data['nivelAcademico'],
-            $data['gradoNivel'],
-            $data['formacionTrabajo'],
+            $data['horasDesarrolloDiseño'] ?: 0,
+            $data['mesesDesarrolloDiseño'] ?: 0,
+            $data['nivelAcademicoIngreso'],
+            $data['gradoNivelAcademico'],
+            $data['formacionTrabajoDesarrolloHumano'],
             $data['edadMinima'],
             $data['requisitosAdicionales'],
             $codigo
@@ -165,7 +169,10 @@ function updateDiseno($pdo, $codigo) {
             http_response_code(404);
             echo json_encode(['error' => 'Diseño no encontrado']);
         } else {
-            echo json_encode(['message' => 'Diseño actualizado exitosamente']);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Diseño actualizado exitosamente'
+            ]);
         }
     } catch (PDOException $e) {
         http_response_code(500);

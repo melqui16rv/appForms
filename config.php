@@ -6,9 +6,14 @@
 
 // Detectar el entorno
 $isLocal = (
-    strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
-    strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false ||
-    strpos($_SERVER['HTTP_HOST'], '::1') !== false
+    (isset($_SERVER['HTTP_HOST']) && (
+        strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+        strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false ||
+        strpos($_SERVER['HTTP_HOST'], '::1') !== false ||
+        strpos($_SERVER['HTTP_HOST'], '172.30.5.255') !== false // Agregar tu IP local
+    )) || 
+    php_sapi_name() === 'cli' || 
+    !isset($_SERVER['HTTP_HOST'])
 );
 
 // Configuración base
@@ -23,20 +28,20 @@ $config = [
 if ($isLocal) {
     // Configuración local
     $config['db'] = [
-        'host' => 'localhost',
+        'host' => '172.30.5.255', // Tu IP para conexiones remotas
         'dbname' => 'disenos_curriculares',
-        'username' => 'root',
-        'password' => '',
+        'username' => 'admin_remoto',
+        'password' => 'admin123',
         'charset' => 'utf8mb4'
     ];
-    $config['base_url'] = 'http://localhost:8081';
+    $config['base_url'] = 'http://172.30.5.255:8080';
 } else {
     // Configuración de producción
     $config['db'] = [
-        'host' => 'localhost', // Cambiar según la configuración de cPanel
-        'dbname' => 'tu_base_de_datos', // Cambiar por el nombre real
-        'username' => 'tu_usuario', // Cambiar por el usuario real
-        'password' => 'tu_password', // Cambiar por la contraseña real
+        'host' => '172.30.5.255', // Tu IP para conexiones remotas desde otros equipos
+        'dbname' => 'disenos_curriculares',
+        'username' => 'admin_remoto',
+        'password' => 'admin123',
         'charset' => 'utf8mb4'
     ];
     $config['base_url'] = 'https://appscide.com/appForms';

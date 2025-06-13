@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Interactivo - Persistencia de Datos</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 20px; 
+        }
+        .test-step { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            background-color: #f9f9f9; 
+        }
+        .test-step.pass { border-color: #28a745; background-color: #d4edda; }
+        .test-step.fail { border-color: #dc3545; background-color: #f8d7da; }
+        .test-step.pending { border-color: #ffc107; background-color: #fff3cd; }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .status { font-weight: bold; }
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .pending { color: #ffc107; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 8px; 
+            margin: 5px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        .form-group { margin-bottom: 15px; }
+        .alert { 
+            padding: 12px; 
+            border-radius: 4px; 
+            margin: 10px 0; 
+        }
+        .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .alert-info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        iframe { width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Interactivo - Persistencia de Datos del Formulario</h1>
+    
+    <div class="test-container">
+        <h2>📋 Instrucciones del Test</h2>
+        <p>Este test verifica que los datos del formulario NO se pierden cuando se generan códigos automáticamente.</p>
+        <p><strong>URL de la aplicación:</strong> <a href="http://172.30.5.255:8080" target="_blank">http://172.30.5.255:8080</a></p>
+    </div>
+
+    <div class="test-container">
+        <h2>🎯 Escenarios de Prueba</h2>
+        
+        <div class="test-step pending" id="test1">
+            <h3>Test 1: Persistencia durante generación de códigos</h3>
+            <p><strong>Pasos a seguir:</strong></p>
+            <ol>
+                <li>Abrir la aplicación en una nueva pestaña</li>
+                <li>Llenar algunos campos del formulario de diseños (ej: Línea Tecnológica, Red Tecnológica)</li>
+                <li>Escribir un código de programa (ej: "ADSI")</li>
+                <li>Escribir una versión (ej: "V1")</li>
+                <li>Verificar que los campos previamente llenados NO se borren</li>
+            </ol>
+            <button onclick="testPersistenceDuringCodeGeneration()">✅ Marcar como COMPLETADO</button>
+            <button onclick="failTest('test1')">❌ FALLÓ</button>
+            <div id="test1-result"></div>
+        </div>
+
+        <div class="test-step pending" id="test2">
+            <h3>Test 2: Persistencia en errores de conexión</h3>
+            <p><strong>Pasos a seguir:</strong></p>
+            <ol>
+                <li>Llenar completamente un formulario</li>
+                <li>Desconectar la red o detener el servidor temporalmente</li>
+                <li>Intentar guardar el formulario</li>
+                <li>Verificar que aparece un error pero los datos NO se borran</li>
+                <li>Reconectar y verificar que los datos siguen ahí</li>
+            </ol>
+            <button onclick="passTest('test2')">✅ COMPLETADO</button>
+            <button onclick="failTest('test2')">❌ FALLÓ</button>
+            <div id="test2-result"></div>
+        </div>
+
+        <div class="test-step pending" id="test3">
+            <h3>Test 3: Carga automática de diseños existentes</h3>
+            <p><strong>Pasos a seguir:</strong></p>
+            <ol>
+                <li>Crear un diseño con código "TEST" versión "V1"</li>
+                <li>Limpiar el formulario</li>
+                <li>Escribir nuevamente "TEST" y "V1"</li>
+                <li>Verificar que se carga automáticamente el diseño existente</li>
+                <li>Verificar que aparece un mensaje de que ya existe</li>
+            </ol>
+            <button onclick="passTest('test3')">✅ COMPLETADO</button>
+            <button onclick="failTest('test3')">❌ FALLÓ</button>
+            <div id="test3-result"></div>
+        </div>
+
+        <div class="test-step pending" id="test4">
+            <h3>Test 4: Limpieza manual vs automática</h3>
+            <p><strong>Pasos a seguir:</strong></p>
+            <ol>
+                <li>Llenar un formulario completamente</li>
+                <li>Hacer clic en "Limpiar" - verificar que se borra todo</li>
+                <li>Llenar nuevamente algunos campos</li>
+                <li>Escribir códigos inválidos - verificar que NO se borra automáticamente</li>
+            </ol>
+            <button onclick="passTest('test4')">✅ COMPLETADO</button>
+            <button onclick="failTest('test4')">❌ FALLÓ</button>
+            <div id="test4-result"></div>
+        </div>
+
+        <div class="test-step pending" id="test5">
+            <h3>Test 5: Consistencia entre formularios</h3>
+            <p><strong>Pasos a seguir:</strong></p>
+            <ol>
+                <li>Probar el mismo comportamiento en formulario de Competencias</li>
+                <li>Probar el mismo comportamiento en formulario de RAPs</li>
+                <li>Verificar que todos mantienen la misma lógica de persistencia</li>
+            </ol>
+            <button onclick="passTest('test5')">✅ COMPLETADO</button>
+            <button onclick="failTest('test5')">❌ FALLÓ</button>
+            <div id="test5-result"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Resumen de Resultados</h2>
+        <div id="summary">
+            <p>Tests pendientes: <span id="pending-count">5</span></p>
+            <p>Tests exitosos: <span id="pass-count">0</span></p>
+            <p>Tests fallidos: <span id="fail-count">0</span></p>
+        </div>
+        
+        <div id="final-result" style="display: none;">
+            <div class="alert alert-success">
+                <h3>🎉 ¡Felicitaciones!</h3>
+                <p>Todos los tests de persistencia de datos han sido completados exitosamente. 
+                La aplicación mantiene correctamente los datos del usuario durante todas las operaciones.</p>
+            </div>
+        </div>
+        
+        <div id="has-failures" style="display: none;">
+            <div class="alert alert-danger">
+                <h3>⚠️ Atención</h3>
+                <p>Algunos tests han fallado. Revise los detalles arriba y verifique las correcciones implementadas.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🌐 Acceso Directo a la Aplicación</h2>
+        <iframe src="http://172.30.5.255:8080" title="Aplicación de Formularios"></iframe>
+        <p><em>Nota: Use esta ventana integrada o abra en una pestaña nueva para realizar las pruebas.</em></p>
+    </div>
+
+    <script>
+        let testResults = {
+            pending: 5,
+            pass: 0,
+            fail: 0
+        };
+
+        function updateSummary() {
+            document.getElementById('pending-count').textContent = testResults.pending;
+            document.getElementById('pass-count').textContent = testResults.pass;
+            document.getElementById('fail-count').textContent = testResults.fail;
+            
+            if (testResults.pending === 0) {
+                if (testResults.fail === 0) {
+                    document.getElementById('final-result').style.display = 'block';
+                } else {
+                    document.getElementById('has-failures').style.display = 'block';
+                }
+            }
+        }
+
+        function passTest(testId) {
+            const testElement = document.getElementById(testId);
+            testElement.className = 'test-step pass';
+            
+            const resultDiv = document.getElementById(testId + '-result');
+            resultDiv.innerHTML = '<div class="alert alert-success"><span class="pass">✅ TEST PASADO</span> - Persistencia de datos funcionando correctamente</div>';
+            
+            testResults.pending--;
+            testResults.pass++;
+            updateSummary();
+        }
+
+        function failTest(testId) {
+            const testElement = document.getElementById(testId);
+            testElement.className = 'test-step fail';
+            
+            const resultDiv = document.getElementById(testId + '-result');
+            resultDiv.innerHTML = '<div class="alert alert-danger"><span class="fail">❌ TEST FALLIDO</span> - Se detectaron problemas con la persistencia de datos</div>';
+            
+            testResults.pending--;
+            testResults.fail++;
+            updateSummary();
+        }
+
+        function testPersistenceDuringCodeGeneration() {
+            // Este es el test más importante, así que pedimos confirmación adicional
+            const confirmed = confirm(
+                "¿Ha verificado que:\n\n" +
+                "1. Los campos del formulario NO se borran al escribir códigos?\n" +
+                "2. Solo se genera el código automáticamente sin afectar otros campos?\n" +
+                "3. La validación funciona pero preserva los datos?\n\n" +
+                "Haga clic en OK solo si TODOS estos puntos son correctos."
+            );
+            
+            if (confirmed) {
+                passTest('test1');
+            }
+        }
+
+        // Inicializar
+        updateSummary();
+    </script>
+</body>
+</html>

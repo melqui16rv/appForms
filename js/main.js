@@ -98,13 +98,14 @@ function generateCodigoDiseno() {
         const codigoGenerado = `${codigoPrograma}-${versionPrograma}`;
         document.getElementById('codigoDiseñoGenerado').value = codigoGenerado;
         
-        // Verificar si existe
+        // Verificar si existe solo cuando ambos campos tienen longitud mínima
         if (codigoPrograma.length >= 3 && versionPrograma.length >= 1) {
             validateDisenoExists(codigoPrograma, versionPrograma);
         }
     } else {
         document.getElementById('codigoDiseñoGenerado').value = '';
         hideAlert('disenoExistente');
+        // NO limpiar el formulario aquí - el usuario está escribiendo
     }
 }
 
@@ -122,9 +123,10 @@ async function validateDisenoExists(codigoPrograma, versionPrograma) {
                 `El diseño ${result.codigoDiseño} ya existe. Los datos se han cargado automáticamente. Puede modificarlos y guardar, o hacer clic en Limpiar para crear uno nuevo.`);
         } else {
             hideAlert('disenoExistente');
-            // Limpiar el formulario si no existe
-            if (!editingDiseno) {
-                clearDisenoForm();
+            // Solo resetear el modo de edición, no borrar el formulario
+            // El usuario está escribiendo, no debemos borrar sus datos
+            if (editingDiseno) {
+                editingDiseno = null;
             }
         }
     } catch (error) {
@@ -164,16 +166,18 @@ async function handleDisenoSubmit(e) {
         
         const result = await response.json();
         
-        if (response.ok) {
+        if (response.ok && (result.success || result.message)) {
             showAlert(result.message || 'Diseño guardado exitosamente', 'success');
-            limpiarFormularioDiseno();
+            clearDisenoForm(); // Solo limpiar después de guardar exitosamente
             loadDisenos();
         } else {
             showAlert(result.error || 'Error al guardar diseño', 'danger');
+            // NO limpiar el formulario en caso de error - preservar los datos del usuario
         }
     } catch (error) {
         console.error('Error enviando diseño:', error);
-        showAlert('Error de conexión', 'danger');
+        showAlert('Error de conexión. Verifique su conexión e intente nuevamente.', 'danger');
+        // NO limpiar el formulario en caso de error de conexión
     }
 }
 
@@ -195,6 +199,15 @@ function clearDisenoForm() {
     document.getElementById('formacionTrabajoDesarrolloHumano').value = '';
     document.getElementById('edadMinima').value = '';
     document.getElementById('requisitosAdicionales').value = '';
+    document.getElementById('codigoDiseñoGenerado').value = '';
+    editingDiseno = null;
+    hideAlert('disenoExistente');
+}
+
+function clearDisenoCodesOnly() {
+    // Solo limpiar los códigos, preservar el resto de datos
+    document.getElementById('codigoPrograma').value = '';
+    document.getElementById('versionPrograma').value = '';
     document.getElementById('codigoDiseñoGenerado').value = '';
     editingDiseno = null;
     hideAlert('disenoExistente');
@@ -286,13 +299,9 @@ async function validateCompetenciaExists(codigoDiseno, codigoCompetencia) {
                 `La competencia ${result.codigoDisenoCompetencia} ya existe. Los datos se han cargado automáticamente. Puede modificarlos y guardar, o hacer clic en Limpiar para crear una nueva.`);
         } else {
             hideAlert('competenciaExistente');
-            // Limpiar campos específicos si no existe
-            if (!editingCompetencia) {
-                document.getElementById('nombreCompetencia').value = '';
-                document.getElementById('normaUnidadCompetencia').value = '';
-                document.getElementById('horasCompetencia').value = '';
-                document.getElementById('requisitosAcademicosInstructor').value = '';
-                document.getElementById('experienciaLaboralInstructor').value = '';
+            // Solo resetear el modo de edición, no borrar los datos del usuario
+            if (editingCompetencia) {
+                editingCompetencia = null;
             }
         }
     } catch (error) {
@@ -327,16 +336,18 @@ async function handleCompetenciaSubmit(e) {
         
         const result = await response.json();
         
-        if (response.ok) {
+        if (response.ok && (result.success || result.message)) {
             showAlert(result.message || 'Competencia guardada exitosamente', 'success');
-            limpiarFormularioCompetencia();
+            clearCompetenciaForm(); // Solo limpiar después de guardar exitosamente
             loadCompetencias();
         } else {
             showAlert(result.error || 'Error al guardar competencia', 'danger');
+            // NO limpiar el formulario en caso de error - preservar los datos del usuario
         }
     } catch (error) {
         console.error('Error enviando competencia:', error);
-        showAlert('Error de conexión', 'danger');
+        showAlert('Error de conexión. Verifique su conexión e intente nuevamente.', 'danger');
+        // NO limpiar el formulario en caso de error de conexión
     }
 }
 
@@ -381,13 +392,13 @@ function fillCompetenciaForm(competencia) {
 }
 
 function clearCompetenciaForm() {
-    document.getElementById('codigoDiseñoCompetencia').value = '';
+    document.getElementById('codigoDiseñoComp').value = '';
     document.getElementById('codigoCompetencia').value = '';
     document.getElementById('nombreCompetencia').value = '';
-    document.getElementById('normaUnidadCompetencia').value = '';
+    document.getElementById('normaUnidad').value = '';
     document.getElementById('horasCompetencia').value = '';
-    document.getElementById('requisitosAcademicosInstructor').value = '';
-    document.getElementById('experienciaLaboralInstructor').value = '';
+    document.getElementById('requisitosInstructor').value = '';
+    document.getElementById('experienciaInstructor').value = '';
     document.getElementById('codigoCompetenciaGenerado').value = '';
     editingCompetencia = null;
     hideAlert('competenciaExistente');
@@ -407,16 +418,17 @@ async function deleteCompetencia(codigoCompetencia) {
                 method: 'DELETE'
             });
             
-            if (response.ok) {
-                showAlert('Competencia eliminada exitosamente', 'success');
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                showAlert(result.message || 'Competencia eliminada exitosamente', 'success');
                 loadCompetencias();
             } else {
-                const error = await response.json();
-                showAlert(`Error al eliminar: ${error.error}`, 'danger');
+                showAlert(result.error || 'Error al eliminar competencia', 'danger');
             }
         } catch (error) {
             console.error('Error eliminando competencia:', error);
-            showAlert('Error al eliminar la competencia', 'danger');
+            showAlert('Error de conexión al eliminar la competencia', 'danger');
         }
     }
 }
@@ -553,10 +565,9 @@ async function validateRapExists(codigoDiseno, codigoCompetencia, codigoRap) {
                 `El RAP ${result.codigoDisenoCompetenciaRap} ya existe. Los datos se han cargado automáticamente. Puede modificarlos y guardar, o hacer clic en Limpiar para crear uno nuevo.`);
         } else {
             hideAlert('rapExistente');
-            // Limpiar campos específicos si no existe
-            if (!editingRap) {
-                document.getElementById('nombreRap').value = '';
-                document.getElementById('horasRap').value = '';
+            // Solo resetear el modo de edición, no borrar los datos del usuario
+            if (editingRap) {
+                editingRap = null;
             }
         }
     } catch (error) {
@@ -589,16 +600,18 @@ async function handleRapSubmit(e) {
         
         const result = await response.json();
         
-        if (response.ok) {
+        if (response.ok && (result.success || result.message)) {
             showAlert(result.message || 'RAP guardado exitosamente', 'success');
-            limpiarFormularioRap();
+            clearRapForm(); // Solo limpiar después de guardar exitosamente
             loadRaps();
         } else {
             showAlert(result.error || 'Error al guardar RAP', 'danger');
+            // NO limpiar el formulario en caso de error - preservar los datos del usuario
         }
     } catch (error) {
         console.error('Error enviando RAP:', error);
-        showAlert('Error de conexión', 'danger');
+        showAlert('Error de conexión. Verifique su conexión e intente nuevamente.', 'danger');
+        // NO limpiar el formulario en caso de error de conexión
     }
 }
 
@@ -644,7 +657,7 @@ async function editDiseno(codigoDiseno) {
 
 function fillDisenoForm(diseno) {
     document.getElementById('codigoPrograma').value = diseno.codigoPrograma || '';
-    document.getElementById('versionPrograma').value = diseno.versionPograma || '';
+    document.getElementById('versionPrograma').value = diseno.versionPrograma || '';
     document.getElementById('lineaTecnologica').value = diseno.lineaTecnologica || '';
     document.getElementById('redTecnologica').value = diseno.redTecnologica || '';
     document.getElementById('redConocimiento').value = diseno.redConocimiento || '';
@@ -673,16 +686,17 @@ async function deleteDiseno(codigoDiseno) {
                 method: 'DELETE'
             });
             
-            if (response.ok) {
-                showAlert('Diseño eliminado exitosamente', 'success');
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                showAlert(result.message || 'Diseño eliminado exitosamente', 'success');
                 loadDisenos();
             } else {
-                const error = await response.json();
-                showAlert(`Error al eliminar: ${error.error}`, 'danger');
+                showAlert(result.error || 'Error al eliminar diseño', 'danger');
             }
         } catch (error) {
             console.error('Error eliminando diseño:', error);
-            showAlert('Error al eliminar el diseño', 'danger');
+            showAlert('Error de conexión al eliminar el diseño', 'danger');
         }
     }
 }
@@ -774,17 +788,6 @@ function fillRapForm(rap) {
     document.getElementById('codigoRapGenerado').value = rap.codigoDiseñoCompetenciaRap;
 }
 
-function clearRapForm() {
-    document.getElementById('codigoDiseñoRap').value = '';
-    document.getElementById('codigoCompetenciaRap').value = '';
-    document.getElementById('codigoRap').value = '';
-    document.getElementById('nombreRap').value = '';
-    document.getElementById('horasRap').value = '';
-    document.getElementById('codigoRapGenerado').value = '';
-    editingRap = null;
-    hideAlert('rapExistente');
-}
-
 async function deleteRap(codigoRap) {
     if (confirm(`¿Está seguro de que desea eliminar el RAP ${codigoRap}?`)) {
         try {
@@ -792,16 +795,17 @@ async function deleteRap(codigoRap) {
                 method: 'DELETE'
             });
             
-            if (response.ok) {
-                showAlert('RAP eliminado exitosamente', 'success');
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                showAlert(result.message || 'RAP eliminado exitosamente', 'success');
                 loadRaps();
             } else {
-                const error = await response.json();
-                showAlert(`Error al eliminar: ${error.error}`, 'danger');
+                showAlert(result.error || 'Error al eliminar RAP', 'danger');
             }
         } catch (error) {
             console.error('Error eliminando RAP:', error);
-            showAlert('Error al eliminar el RAP', 'danger');
+            showAlert('Error de conexión al eliminar el RAP', 'danger');
         }
     }
 }

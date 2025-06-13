@@ -5,13 +5,22 @@ CREATE TABLE `diseños`(
     -- codigoDiseño=124101-1
     `codigoPrograma` VARCHAR(255),
     `versionPograma` VARCHAR(255),
+    --"nuevo campo:
+    `nombrePrograma` VARCHAR(255),
+    --"
     `lineaTecnologica` VARCHAR(255),
     `redTecnologica` VARCHAR(255),
     `redConocimiento` VARCHAR(255),
-    `horasDesarrolloDiseño` DECIMAL(10,2),
-    `mesesDesarrolloDiseño` DECIMAL(10,2),
+    --"nuevo campo:
+    `horasDesarrolloLectiva` DECIMAL(10,2),
+    `horasDesarrolloProductiva` DECIMAL(10,2),
+    `mesesDesarrolloLectiva` DECIMAL(10,2),
+    `mesesDesarrolloProductiva` DECIMAL(10,2),
+    --"
+    `horasDesarrolloDiseño` DECIMAL(10,2), -- es la suma entre: horasDesarrolloLectiva+horasDesarrolloProductiva
+    `mesesDesarrolloDiseño` DECIMAL(10,2), -- es la suma entre: mesesDesarrolloLectiva+mesesDesarrolloProductiva
     `nivelAcademicoIngreso` VARCHAR(255),
-    `gradoNivelAcademico` VARCHAR(255),
+    `gradoNivelAcademico` INT, -- antes estaba en VARCHAR(255) pero ahora se cambio a INT
     `formacionTrabajoDesarrolloHumano` ENUM('Si', 'No'),
     `edadMinima` INT,
     `requisitosAdicionales` TEXT,
