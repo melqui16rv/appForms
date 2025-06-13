@@ -4,6 +4,14 @@
 # Activar el motor de reescritura
 RewriteEngine On
 
+# IMPORTANTE: Prevenir redirecciones heredadas del .htaccess del dominio raíz
+# Esta regla debe ir ANTES que cualquier otra regla de reescritura
+RewriteRule ^appForms/(.*)$ - [L]
+
+# Forzar que las peticiones a esta carpeta NO sean redirigidas
+RewriteCond %{REQUEST_URI} ^/appForms/
+RewriteRule .* - [L]
+
 # Configurar DirectoryIndex para servir index.php por defecto
 DirectoryIndex index.php
 

@@ -1,0 +1,57 @@
+# .htaccess CORREGIDO para la raíz del dominio appscide.com
+# Este archivo debe colocarse en public_html/.htaccess en cPanel
+# IMPORTANTE: Este archivo excluye específicamente la carpeta appForms de redirecciones
+
+RewriteEngine On
+
+# REGLA CRÍTICA: Excluir completamente la carpeta appForms de cualquier redirección
+# Esta regla debe ir ANTES que cualquier otra regla de redirección
+RewriteRule ^appForms(/.*)?$ - [L]
+
+# Aquí pueden ir las demás reglas del sitio principal
+# Ejemplo de reglas comunes (ajustar según sea necesario):
+
+# Redirigir HTTP a HTTPS (excepto appForms)
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} !^/appForms/
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Forzar www (excepto appForms)
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteCond %{REQUEST_URI} !^/appForms/
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Otras reglas del sitio (ejemplo)
+# RewriteRule ^otra-seccion/(.*)$ /otra-carpeta/$1 [L]
+
+# VERIFICACIÓN FINAL: Asegurar que appForms nunca sea redirigido
+RewriteCond %{REQUEST_URI} ^/appForms/
+RewriteRule .* - [L]
+
+# Configuraciones de seguridad y optimización
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Configurar tipos MIME
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType application/json .json
+</IfModule>
+
+# Cache para archivos estáticos
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|woff|woff2|ttf|eot|svg)$">
+    Header set Cache-Control "public, max-age=31536000"
+</FilesMatch>
+
+# Proteger archivos sensibles
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+<FilesMatch "\.(sql|log|bak)$">
+    Require all denied
+</FilesMatch>
