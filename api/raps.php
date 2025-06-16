@@ -56,19 +56,19 @@ switch ($method) {
 }
 
 function getAllRaps($pdo) {
-    $stmt = $pdo->query("SELECT * FROM raps ORDER BY codigoDiseñoCompetenciaRap");
+    $stmt = $pdo->query("SELECT * FROM raps ORDER BY codigoDisenoCompetenciaRap");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getRapsByCompetencia($pdo, $codigoCompetencia) {
-    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDiseñoCompetenciaRap LIKE ? ORDER BY codigoDiseñoCompetenciaRap");
+    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDisenoCompetenciaRap LIKE ? ORDER BY codigoDisenoCompetenciaRap");
     $stmt->execute([$codigoCompetencia . '-%']);
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function validateRap($pdo, $codigoDiseno, $codigoCompetencia, $codigoRap) {
     $codigoDisenoCompetenciaRap = $codigoDiseno . '-' . $codigoCompetencia . '-' . $codigoRap;
-    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDiseñoCompetenciaRap = ?");
+    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDisenoCompetenciaRap = ?");
     $stmt->execute([$codigoDisenoCompetenciaRap]);
     $rap = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -103,7 +103,7 @@ function createRap($pdo) {
         $codigoDisenoCompetenciaRap = $data['codigoDiseno'] . '-' . $data['codigoCompetencia'] . '-' . $data['codigoRap'];
         
         // Verificar si ya existe
-        $checkStmt = $pdo->prepare("SELECT codigoDiseñoCompetenciaRap FROM raps WHERE codigoDiseñoCompetenciaRap = ?");
+        $checkStmt = $pdo->prepare("SELECT codigoDisenoCompetenciaRap FROM raps WHERE codigoDisenoCompetenciaRap = ?");
         $checkStmt->execute([$codigoDisenoCompetenciaRap]);
         if ($checkStmt->fetch()) {
             http_response_code(409);
@@ -114,7 +114,7 @@ function createRap($pdo) {
         // Insertar nuevo RAP
         $stmt = $pdo->prepare("
             INSERT INTO raps (
-                codigoDiseñoCompetenciaRap, codigoRap, nombreRap, horasDesarrolloRap
+                codigoDisenoCompetenciaRap, codigoRap, nombreRap, horasDesarrolloRap
             ) VALUES (?, ?, ?, ?)
         ");
         
@@ -153,7 +153,7 @@ function updateRap($pdo, $codigo) {
         }
         
         // Verificar si el RAP existe
-        $checkStmt = $pdo->prepare("SELECT codigoDiseñoCompetenciaRap FROM raps WHERE codigoDiseñoCompetenciaRap = ?");
+        $checkStmt = $pdo->prepare("SELECT codigoDisenoCompetenciaRap FROM raps WHERE codigoDisenoCompetenciaRap = ?");
         $checkStmt->execute([$codigo]);
         if (!$checkStmt->fetch()) {
             http_response_code(404);
@@ -167,7 +167,7 @@ function updateRap($pdo, $codigo) {
                 nombreRap = ?,
                 horasDesarrolloRap = ?,
                 fechaActualizacion = CURRENT_TIMESTAMP
-            WHERE codigoDiseñoCompetenciaRap = ?
+            WHERE codigoDisenoCompetenciaRap = ?
         ");
         
         $result = $stmt->execute([
@@ -192,7 +192,7 @@ function updateRap($pdo, $codigo) {
 }
 
 function getRapById($pdo, $codigo) {
-    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDiseñoCompetenciaRap = ?");
+    $stmt = $pdo->prepare("SELECT * FROM raps WHERE codigoDisenoCompetenciaRap = ?");
     $stmt->execute([$codigo]);
     $rap = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($rap) {
@@ -206,7 +206,7 @@ function getRapById($pdo, $codigo) {
 function deleteRap($pdo, $codigo) {
     try {
         // Eliminar el RAP (no tiene dependencias)
-        $stmt = $pdo->prepare("DELETE FROM raps WHERE codigoDiseñoCompetenciaRap = ?");
+        $stmt = $pdo->prepare("DELETE FROM raps WHERE codigoDisenoCompetenciaRap = ?");
         $result = $stmt->execute([$codigo]);
         
         if ($result && $stmt->rowCount() > 0) {

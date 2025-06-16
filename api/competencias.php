@@ -56,26 +56,26 @@ switch ($method) {
 }
 
 function getAllCompetencias($pdo) {
-    $stmt = $pdo->query("SELECT * FROM competencias ORDER BY codigoDiseñoCompetencia");
+    $stmt = $pdo->query("SELECT * FROM competencias ORDER BY codigoDisenoCompetencia");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getCompetenciasByDiseno($pdo, $codigoDiseno) {
-    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDiseñoCompetencia LIKE ? ORDER BY codigoDiseñoCompetencia");
+    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDisenoCompetencia LIKE ? ORDER BY codigoDisenoCompetencia");
     $stmt->execute([$codigoDiseno . '-%']);
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function validateCompetencia($pdo, $codigoDiseno, $codigoCompetencia) {
     $codigoDisenoCompetencia = $codigoDiseno . '-' . $codigoCompetencia;
-    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDiseñoCompetencia = ?");
+    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDisenoCompetencia = ?");
     $stmt->execute([$codigoDisenoCompetencia]);
     $competencia = $stmt->fetch(PDO::FETCH_ASSOC);
     
     echo json_encode([
         'exists' => !empty($competencia),
         'competencia' => $competencia ?: null,
-        'codigoDiseñoCompetencia' => $codigoDisenoCompetencia
+        'codigoDisenoCompetencia' => $codigoDisenoCompetencia
     ]);
 }
 
@@ -103,7 +103,7 @@ function createCompetencia($pdo) {
         $codigoDisenoCompetencia = $data['codigoDiseno'] . '-' . $data['codigoCompetencia'];
         
         // Verificar si ya existe
-        $checkStmt = $pdo->prepare("SELECT codigoDiseñoCompetencia FROM competencias WHERE codigoDiseñoCompetencia = ?");
+        $checkStmt = $pdo->prepare("SELECT codigoDisenoCompetencia FROM competencias WHERE codigoDisenoCompetencia = ?");
         $checkStmt->execute([$codigoDisenoCompetencia]);
         if ($checkStmt->fetch()) {
             http_response_code(409);
@@ -114,7 +114,7 @@ function createCompetencia($pdo) {
         // Insertar nueva competencia
         $stmt = $pdo->prepare("
             INSERT INTO competencias (
-                codigoDiseñoCompetencia, codigoCompetencia, nombreCompetencia,
+                codigoDisenoCompetencia, codigoCompetencia, nombreCompetencia,
                 normaUnidadCompetencia, horasDesarrolloCompetencia,
                 requisitosAcademicosInstructor, experienciaLaboralInstructor
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -158,7 +158,7 @@ function updateCompetencia($pdo, $codigo) {
         }
         
         // Verificar si la competencia existe
-        $checkStmt = $pdo->prepare("SELECT codigoDiseñoCompetencia FROM competencias WHERE codigoDiseñoCompetencia = ?");
+        $checkStmt = $pdo->prepare("SELECT codigoDisenoCompetencia FROM competencias WHERE codigoDisenoCompetencia = ?");
         $checkStmt->execute([$codigo]);
         if (!$checkStmt->fetch()) {
             http_response_code(404);
@@ -175,7 +175,7 @@ function updateCompetencia($pdo, $codigo) {
                 requisitosAcademicosInstructor = ?,
                 experienciaLaboralInstructor = ?,
                 fechaActualizacion = CURRENT_TIMESTAMP
-            WHERE codigoDiseñoCompetencia = ?
+            WHERE codigoDisenoCompetencia = ?
         ");
         
         $result = $stmt->execute([
@@ -203,7 +203,7 @@ function updateCompetencia($pdo, $codigo) {
 }
 
 function getCompetenciaById($pdo, $codigo) {
-    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDiseñoCompetencia = ?");
+    $stmt = $pdo->prepare("SELECT * FROM competencias WHERE codigoDisenoCompetencia = ?");
     $stmt->execute([$codigo]);
     $competencia = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($competencia) {
@@ -217,7 +217,7 @@ function getCompetenciaById($pdo, $codigo) {
 function deleteCompetencia($pdo, $codigo) {
     try {
         // Verificar si tiene RAPs asociados
-        $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM raps WHERE codigoDiseñoCompetenciaRap LIKE ?");
+        $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM raps WHERE codigoDisenoCompetenciaRap LIKE ?");
         $checkStmt->execute([$codigo . '-%']);
         $result = $checkStmt->fetch(PDO::FETCH_ASSOC);
         
@@ -228,7 +228,7 @@ function deleteCompetencia($pdo, $codigo) {
         }
         
         // Eliminar la competencia
-        $stmt = $pdo->prepare("DELETE FROM competencias WHERE codigoDiseñoCompetencia = ?");
+        $stmt = $pdo->prepare("DELETE FROM competencias WHERE codigoDisenoCompetencia = ?");
         $result = $stmt->execute([$codigo]);
         
         if ($result && $stmt->rowCount() > 0) {

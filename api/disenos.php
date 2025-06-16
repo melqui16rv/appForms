@@ -56,20 +56,20 @@ try {        switch ($method) {
 }
 
 function getAllDisenos($pdo) {
-    $stmt = $pdo->query("SELECT * FROM diseños ORDER BY codigoDiseño");
+    $stmt = $pdo->query("SELECT * FROM disenos ORDER BY codigoDiseno");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function validateDiseno($pdo, $codigoPrograma, $versionPrograma) {
     $codigoDiseno = $codigoPrograma . '-' . $versionPrograma;
-    $stmt = $pdo->prepare("SELECT * FROM diseños WHERE codigoDiseño = ?");
+    $stmt = $pdo->prepare("SELECT * FROM disenos WHERE codigoDiseno = ?");
     $stmt->execute([$codigoDiseno]);
     $diseno = $stmt->fetch(PDO::FETCH_ASSOC);
     
     echo json_encode([
         'exists' => !empty($diseno),
         'diseno' => $diseno ?: null,
-        'codigoDiseño' => $codigoDiseno
+        'codigoDiseno' => $codigoDiseno
     ]);
 }
 
@@ -85,18 +85,18 @@ function createDiseno($pdo) {
     $codigoDiseno = $data['codigoPrograma'] . '-' . $data['versionPrograma'];
     
     // Verificar si ya existe
-    $stmt = $pdo->prepare("SELECT codigoDiseño FROM diseños WHERE codigoDiseño = ?");
+    $stmt = $pdo->prepare("SELECT codigoDiseno FROM disenos WHERE codigoDiseno = ?");
     $stmt->execute([$codigoDiseno]);
     
     if ($stmt->fetch()) {
         http_response_code(400);
-        echo json_encode(['error' => 'El diseño ya existe', 'codigoDiseño' => $codigoDiseno]);
+        echo json_encode(['error' => 'El diseño ya existe', 'codigoDiseno' => $codigoDiseno]);
         return;
     }
     
     $stmt = $pdo->prepare("
         INSERT INTO diseños (
-            codigoDiseño, codigoPrograma, versionPograma, lineaTecnologica,
+            codigoDiseno, codigoPrograma, versionPrograma, lineaTecnologica,
             redTecnologica, redConocimiento, horasDesarrolloDiseño, mesesDesarrolloDiseño,
             nivelAcademicoIngreso, gradoNivelAcademico, formacionTrabajoDesarrolloHumano,
             edadMinima, requisitosAdicionales
@@ -123,7 +123,7 @@ function createDiseno($pdo) {
         echo json_encode([
             'success' => true,
             'message' => 'Diseño creado exitosamente', 
-            'codigoDiseño' => $codigoDiseno
+            'codigoDiseno' => $codigoDiseno
         ]);
     } catch (PDOException $e) {
         http_response_code(500);
@@ -147,7 +147,7 @@ function updateDiseno($pdo, $codigo) {
             nivelAcademicoIngreso = ?, gradoNivelAcademico = ?,
             formacionTrabajoDesarrolloHumano = ?, edadMinima = ?,
             requisitosAdicionales = ?
-        WHERE codigoDiseño = ?
+        WHERE codigoDiseno = ?
     ");
     
     try {
@@ -182,7 +182,7 @@ function updateDiseno($pdo, $codigo) {
 
 function getDisenoById($pdo, $codigo) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM diseños WHERE codigoDiseño = ?");
+        $stmt = $pdo->prepare("SELECT * FROM disenos WHERE codigoDiseno = ?");
         $stmt->execute([$codigo]);
         $diseno = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -201,7 +201,7 @@ function getDisenoById($pdo, $codigo) {
 function deleteDiseno($pdo, $codigo) {
     try {
         // Verificar si tiene competencias asociadas
-        $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM competencias WHERE codigoDiseñoCompetencia LIKE ?");
+        $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM competencias WHERE codigoDisenoCompetencia LIKE ?");
         $checkStmt->execute([$codigo . '-%']);
         $result = $checkStmt->fetch(PDO::FETCH_ASSOC);
         
@@ -212,7 +212,7 @@ function deleteDiseno($pdo, $codigo) {
         }
         
         // Eliminar el diseño
-        $stmt = $pdo->prepare("DELETE FROM diseños WHERE codigoDiseño = ?");
+        $stmt = $pdo->prepare("DELETE FROM disenos WHERE codigoDiseno = ?");
         $result = $stmt->execute([$codigo]);
         
         if ($result && $stmt->rowCount() > 0) {
