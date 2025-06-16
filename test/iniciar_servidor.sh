@@ -18,28 +18,15 @@ fi
 # Obtener IP
 MY_IP=$(ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -1)
 
-# Verificar si el puerto 8080 está libre
-if lsof -i :8080 >/dev/null 2>&1; then
-    echo "   ⚠️  Puerto 8080 ya está en uso"
-    echo "   🔍 Proceso actual:"
-    lsof -i :8080
-    echo
-    read -p "¿Quieres terminar el proceso existente? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "   🛑 Terminando proceso..."
-        sudo lsof -t -i :8080 | xargs kill -9
-        sleep 2
-    else
-        echo "   ❌ Cancelando inicio..."
-        exit 1
-    fi
-fi
-
 echo "🌐 Iniciando servidor PHP en $MY_IP:8080..."
 echo "   📝 Logs se mostrarán abajo..."
 echo "   🛑 Para detener: Ctrl+C"
-echo "   🔗 URL: http://$MY_IP:8080"
+echo "   🔗 URL local: http://localhost:8080"
+echo "   🌍 URL red: http://$MY_IP:8080"
+echo "   📱 Acceso desde otros dispositivos: http://$MY_IP:8080"
+echo
+echo "💡 IMPORTANTE: Si cambias de red WiFi, ejecuta:"
+echo "   ./test/actualizar_ip_red.sh"
 echo
 echo "=== LOGS DEL SERVIDOR ==="
 

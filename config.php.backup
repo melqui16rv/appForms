@@ -55,7 +55,7 @@ if ($isLocal) {
     
     // Configuración manual de IP (USAR SOLO SI ES NECESARIO)
     // $config['base_url'] = 'http://TU_IP_AQUI:8080';
-    // Ejemplo: $config['base_url'] = 'http://192.168.55.77:8080';
+    // Ejemplo: $config['base_url'] = 'http://192.168.1.100:8080';
 } else {
     // Configuración de producción
     $config['db'] = [
